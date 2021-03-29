@@ -1,0 +1,26 @@
+apiVersion: networking.k8s.io/v1beta1
+kind: Ingress
+metadata:
+  name: ssl-tls-ingress
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: letsencrypt
+spec:
+  tls:
+    - hosts:
+      - frontend.20.74.17.26.nip.io # update IP address here frontend.20.74.11.158.nip.io
+      secretName: app-web-cert
+  rules:
+  - host: frontend.20.74.17.26.nip.io # update IP address here frontend.20.74.11.158.nip.io
+    http:
+      paths:
+      - backend:
+          serviceName: service-web
+          servicePort: 80
+        path: /
+
+
+
+
+

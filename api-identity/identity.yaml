@@ -1,0 +1,50 @@
+# dans un namespace "projet"
+# deploiement de 1 pod d'une base de données mysql (attention, on parle d'une base de données!!!!!!)
+# deploiement de 3 pods wordpress
+# service d'accès à mysql interne au cluster
+# service d'accès à l'application wordpress depuis l'extérieur
+
+
+#deployment identity
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-deployment
+  namespace: projet
+  labels:
+    app: identity
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: identity-pod
+  template:
+    metadata:
+      labels:
+        app: identity-pod
+    spec:
+      containers:
+      - image: bmehdi78/identity.api 
+        name: identity-cont
+        ports:
+        - containerPort: 80
+        env:
+        - name: RedisHost
+          value : userdata-service:6379 #user.data:6379
+        - name: HostRabbitmq
+          value : rabbitmq-service #Mettre nom du service  
+      restartPolicy: Always
+
+---
+#service identity
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-service
+  namespace: projet
+spec:
+  selector:
+    app: identity-pod
+  ports:                                                        # Mettre le même que celui indiqué plus haut dans le deployement
+    - port: 80
+  type: ClusterIP

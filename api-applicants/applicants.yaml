@@ -1,0 +1,43 @@
+#deployment applicants
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: applicants-deployment
+  namespace: projet
+  labels:
+    app: applicants
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: applicants-pod
+  template:
+    metadata:
+      labels:
+        app: applicants-pod
+    spec:
+      containers:
+      - image: bmehdi78/applicants.api 
+        name: applicants-cont
+        ports:
+        - containerPort: 80
+        env:
+        - name: ConnectionString
+          value : Server=sql.data;User=sa;Password=Pass@word;Database=dotnetgigs.jobs;
+        - name: HostRabbitmq
+          value : rabbitmq-service #Mettre nom du service  
+      restartPolicy: Always
+
+---
+#service applicants
+apiVersion: v1
+kind: Service
+metadata:
+  name: applicants-service
+  namespace: projet
+spec:
+  selector:
+    app: applicants-pod
+  ports:                                                        # Mettre le même que celui indiqué plus haut dans le deployement
+    - port: 80
+  type: ClusterIP

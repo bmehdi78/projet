@@ -1,0 +1,39 @@
+#deployment web
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-deployment
+  namespace: projet
+  labels:
+    app: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web-pod
+  template:
+    metadata:
+      labels:
+        app: web-pod
+    spec:
+      containers:
+      - image: bmehdi78/web 
+        name: web-cont
+        ports:
+        - containerPort: 80
+      restartPolicy: Always
+
+---
+#service web
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: projet
+spec:
+  selector:
+    app: web-pod
+  ports:                                                        # Mettre le même que celui indiqué plus haut dans le deployement
+    - port: 8080
+      targetPort: 80
+  type: LoadBalancer
